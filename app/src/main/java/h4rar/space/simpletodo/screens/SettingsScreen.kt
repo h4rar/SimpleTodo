@@ -130,113 +130,119 @@ private fun ItemLayout(
 
 
     Card(
-        shape = RoundedCornerShape(size = 12.dp)
+        shape = RoundedCornerShape(size = 5.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable {
                 }
-                .padding(vertical = 5.dp, horizontal = 6.dp),
+                .padding(vertical = 8.dp, horizontal = 2.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceAround
         ) {
-            IconButton(
-                modifier = Modifier
-                    .size(ACTION_ITEM_SIZE.dp)
-                    .padding(end = 0.dp),
-                onClick = {
-                    viewModel.upTab(tab.id)
-                    if (previous != null) {
-                        viewModel.downTab(previous.id)
-                    }
-                },
-                content = {
-                    Icon(
-                        painter = painterResource(id = R.drawable.arrow_up),
-                        tint = Color.Gray,
-                        contentDescription = "up tab",
-                    )
-                }
-            )
-            IconButton(
-                modifier = Modifier
-                    .size(ACTION_ITEM_SIZE.dp)
-                    .padding(end = 0.dp),
-                onClick = {
-                    viewModel.downTab(tab.id)
-                    if (next != null) {
-                        viewModel.upTab(next.id)
-                    }
-                },
-                content = {
-                    Icon(
-                        painter = painterResource(id = R.drawable.arrow_down),
-                        tint = Color.Gray,
-                        contentDescription = "down tab",
-                    )
-                }
-            )
-
-            Text(
-                text = tab.name,
-                fontSize = 16.sp,
-                color = MaterialTheme.colors.secondary
-            )
-
-            Spacer(modifier = Modifier.width(width = 12.dp))
-            IconButton(
-                modifier = Modifier
-                    .size(ACTION_ITEM_SIZE.dp)
-                    .padding(end = 0.dp),
-                onClick = {
-                    editDialogState.value = true
-                },
-                content = {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_edit),
-                        tint = Color.Gray,
-                        contentDescription = "edit action",
-                    )
-                }
-            )
-
             if (index != 0) {
                 IconButton(
                     modifier = Modifier
                         .size(ACTION_ITEM_SIZE.dp)
                         .padding(end = 0.dp),
                     onClick = {
-                        deleteTabState.value = true
+                        viewModel.upTab(tab.id)
+                        if (previous != null) {
+                            viewModel.downTab(previous.id)
+                        }
                     },
                     content = {
                         Icon(
-                            painter = painterResource(id = R.drawable.ic_bin),
+                            painter = painterResource(id = R.drawable.arrow_up),
                             tint = Color.Gray,
-                            contentDescription = "delete action",
+                            contentDescription = "up tab",
                         )
                     }
                 )
             }
 
-            AlertDialog(
-                title = "The tab with name \"" + tab.name + "\" will be deleted, you want to continue",
-                confirmButtonTitle = Constants.Keys.OK,
-                dialogState = deleteTabState,
-                onConfirmButtonClick = {
-                    viewModel.deleteTab(tab.id)
-                }
-            )
+            if (index != values.size - 1) {
+                IconButton(
+                    modifier = Modifier
+                        .size(ACTION_ITEM_SIZE.dp)
+                        .padding(end = 0.dp),
+                    onClick = {
+                        viewModel.downTab(tab.id)
+                        if (next != null) {
+                            viewModel.upTab(next.id)
+                        }
+                    },
+                    content = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.arrow_down),
+                            tint = Color.Gray,
+                            contentDescription = "down tab",
+                        )
+                    }
+                )
 
-            Dialog(
-                title = Constants.Keys.UPDATE_TAB,
-                confirmButtonTitle = Constants.Keys.OK,
-                dialogState = editDialogState,
-                sourceText = tab.name,
-                onConfirmButtonClick = {
-                    viewModel.updateTab(tab.id, it)
+            }
+
+                Text(
+                    text = tab.name,
+                    fontSize = 16.sp,
+                    color = MaterialTheme.colors.secondary
+                )
+
+                Spacer(modifier = Modifier.width(width = 12.dp))
+                IconButton(
+                    modifier = Modifier
+                        .size(ACTION_ITEM_SIZE.dp)
+                        .padding(end = 0.dp),
+                    onClick = {
+                        editDialogState.value = true
+                    },
+                    content = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_edit),
+                            tint = Color.Gray,
+                            contentDescription = "edit action",
+                        )
+                    }
+                )
+
+                if (index != 0) {
+                    IconButton(
+                        modifier = Modifier
+                            .size(ACTION_ITEM_SIZE.dp)
+                            .padding(end = 0.dp),
+                        onClick = {
+                            deleteTabState.value = true
+                        },
+                        content = {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_bin),
+                                tint = Color.Gray,
+                                contentDescription = "delete action",
+                            )
+                        }
+                    )
                 }
-            )
+
+                AlertDialog(
+                    title = "The tab with name \"" + tab.name + "\" will be deleted, you want to continue",
+                    confirmButtonTitle = Constants.Keys.OK,
+                    dialogState = deleteTabState,
+                    onConfirmButtonClick = {
+                        viewModel.deleteTab(tab.id)
+                    }
+                )
+
+                Dialog(
+                    title = Constants.Keys.UPDATE_TAB,
+                    confirmButtonTitle = Constants.Keys.OK,
+                    dialogState = editDialogState,
+                    sourceText = tab.name,
+                    onConfirmButtonClick = {
+                        viewModel.updateTab(tab.id, it)
+                    }
+                )
+            }
         }
     }
-}

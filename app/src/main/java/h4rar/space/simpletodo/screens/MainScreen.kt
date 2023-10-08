@@ -4,22 +4,16 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -30,7 +24,6 @@ import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.google.accompanist.pager.*
-import dev.chrisbanes.snapper.ExperimentalSnapperApi
 import h4rar.space.simpletodo.MainViewModel
 import h4rar.space.simpletodo.model.Note
 import h4rar.space.simpletodo.model.SimpleObject
@@ -43,14 +36,13 @@ import kotlinx.coroutines.*
 import java.util.*
 import java.util.stream.Collectors.toList
 
-const val ACTION_ITEM_SIZE = 56
-const val CARD_HEIGHT = 56
+const val ACTION_ITEM_SIZE = 46
+const val CARD_HEIGHT = 46
 const val CARD_OFFSET = -112f
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @OptIn(
-    ExperimentalPagerApi::class,
-    ExperimentalMaterialApi::class
+    ExperimentalPagerApi::class
 )
 @ExperimentalCoroutinesApi
 @Composable
@@ -60,13 +52,8 @@ fun MainScreen(
 ) {
     val tads = viewModel.readAllTabsSort().observeAsState(listOf()).value
     val tabFromDb = tads.stream().map { SimpleObject(it.id, it.name) }.collect(toList())
-    val pagerState = rememberPagerState()
+    val pagerState = rememberPagerState(initialPage = 0)
     val tabs = if (tabFromDb.isEmpty()) return else tabFromDb
-    val bottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
-    val coroutineScope = rememberCoroutineScope()
-    val focusRequester = remember { FocusRequester() }
-    val bottomSheetCreateState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
-    val coroutineScopeCreate = rememberCoroutineScope()
 
     var tab: Tab? = null
 
@@ -80,9 +67,6 @@ fun MainScreen(
                 Tabs(
                     tabs = tabs,
                     pagerState = pagerState,
-                    viewModel = viewModel,
-                    bottomSheetState = bottomSheetState,
-                    coroutineScope = coroutineScope,
                     navController = navController
                 )
                 HorizontalPager(
@@ -107,30 +91,25 @@ fun MainScreen(
                                 Box() {
                                     TabsContent(
                                         tabs = tads,
-                                        pagerState = pagerState,
                                         paddingValues = paddingValues,
                                         viewModel = viewModel,
-                                        bottomSheetCreateState = bottomSheetCreateState,
-                                        coroutineScopeCreate = coroutineScopeCreate,
-                                        onConfirmButtonClick = { tab = it },
-                                        focusRequester = focusRequester,
                                         page = page
                                     )
                                 }
-                                Dialog(
-                                    title = Constants.Keys.TASK,
-                                    confirmButtonTitle = Constants.Keys.OK,
-                                    dialogState = createDialogState,
-                                    sourceText = null,
-                                    onConfirmButtonClick = {
-                                        val note = Note(UUID.randomUUID(), it, false, tab!!.id)
-                                        viewModel.addNote(note)
-                                    }
-                                )
                             }
                         }
                     }
                 }
+                Dialog(
+                    title = Constants.Keys.TASK,
+                    confirmButtonTitle = Constants.Keys.OK,
+                    dialogState = createDialogState,
+                    sourceText = null,
+                    onConfirmButtonClick = {
+                        val note = Note(UUID.randomUUID(), it, false, tab!!.id)
+                        viewModel.addNote(note)
+                    }
+                )
                 Box(
                     modifier = Modifier
                         .wrapContentSize()
@@ -141,6 +120,8 @@ fun MainScreen(
                 ) {
                     TextButton(
                         onClick = {
+                            val currentPage = pagerState.currentPage
+                            tab = tads[currentPage]
                             createDialogState.value = true
                         }) {
                         Text(
@@ -152,29 +133,37 @@ fun MainScreen(
             }
         }
     }
+    Dialog(
+        title = Constants.Keys.TASK,
+        confirmButtonTitle = Constants.Keys.OK,
+        dialogState = createDialogState,
+        sourceText = null,
+        onConfirmButtonClick = {
+            val note = Note(UUID.randomUUID(), it, false, tab!!.id)
+            viewModel.addNote(note)
+        }
+    )
 }
 
 val createDialogState by lazy { mutableStateOf(false) }
 val editDialogState by lazy { mutableStateOf(false) }
 
 @OptIn(
-    ExperimentalPagerApi::class, ExperimentalLifecycleComposeApi::class,
-    ExperimentalMaterialApi::class, ExperimentalComposeUiApi::class
+    ExperimentalLifecycleComposeApi::class,
 )
 @Composable
 fun TabsContent(
-    tabs: List<Tab>, pagerState: PagerState, paddingValues: PaddingValues, viewModel: MainViewModel,
-    bottomSheetCreateState: ModalBottomSheetState, coroutineScopeCreate: CoroutineScope,
-    onConfirmButtonClick: (Tab) -> Unit, focusRequester: FocusRequester,
+    tabs: List<Tab>,
+    paddingValues: PaddingValues,
+    viewModel: MainViewModel,
     page: Int
 ) {
     val coroutineScopeUpdate = rememberCoroutineScope()
     val tab = tabs[page]
-    onConfirmButtonClick(tab)
     val notes = viewModel.readAllNotesByTabId(tabId = tab.id).observeAsState(listOf()).value
     val revealedCardIds by viewModel.revealedCardIdsList.collectAsStateWithLifecycle()
     var title by remember { mutableStateOf(EMPTY) }
-    var n: Note? = null;
+    var n: Note? = null
 
     LazyColumn(Modifier.padding(paddingValues)) {
         items(notes) { note ->
@@ -185,7 +174,7 @@ fun TabsContent(
             ) {
                 Row(
                     Modifier
-                        .padding(horizontal = 8.dp, vertical = 8.dp)
+                        .padding(horizontal = 8.dp, vertical = 2.dp)
                         .fillMaxWidth(),
                     horizontalArrangement = Arrangement.End
                 ) {
@@ -236,24 +225,6 @@ fun textStyle() = TextStyle(
     fontWeight = FontWeight(400)
 )
 
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterialApi::class)
-@Composable
-private fun showHide(
-    bottomSheetCreateState: ModalBottomSheetState,
-    kc: SoftwareKeyboardController?
-) {
-    LaunchedEffect(Unit) {
-        snapshotFlow { bottomSheetCreateState.currentValue }
-            .collect {
-                if (it.name.equals("Hidden")) {
-                    kc?.hide()
-                } else {
-                    kc?.show()
-                }
-            }
-    }
-}
-
 @Composable
 private fun CustomIndicator() {
 }
@@ -265,9 +236,6 @@ private fun CustomIndicator() {
 fun Tabs(
     tabs: List<SimpleObject>,
     pagerState: PagerState,
-    viewModel: MainViewModel,
-    bottomSheetState: ModalBottomSheetState,
-    coroutineScope: CoroutineScope,
     navController: NavController,
 ) {
     val scope = rememberCoroutineScope()

@@ -3,6 +3,7 @@ package h4rar.space.simpletodo.screens
 import android.annotation.SuppressLint
 import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
@@ -69,7 +70,7 @@ fun DraggableCard(
         modifier =
         Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .padding(horizontal = 16.dp, vertical = 2.dp)
             .height(cardHeight)
             .offset { IntOffset(offsetTransition.roundToInt(), 0) }
             .draggable(
@@ -83,7 +84,7 @@ fun DraggableCard(
             ),
         backgroundColor = cardBgColor,
         shape = remember {
-            RoundedCornerShape(10.dp)
+            RoundedCornerShape(5.dp)
         },
         elevation = cardElevation,
         onClick = { onClick() },

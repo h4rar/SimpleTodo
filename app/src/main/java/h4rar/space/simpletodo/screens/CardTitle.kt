@@ -1,5 +1,6 @@
 package h4rar.space.simpletodo.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
@@ -30,7 +31,8 @@ fun CardTitle(note: Note) {
         ),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(10.dp)
+            .background(MaterialTheme.colors.primaryVariant)
+            .padding(6.dp)
         ,
         textAlign = TextAlign.Center,
         textDecoration =
