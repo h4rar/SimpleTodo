@@ -12,7 +12,6 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -170,13 +169,13 @@ fun TabsContent(
             Box(
                 Modifier
                     .fillMaxWidth()
-                    .defaultMinSize()
+                    .wrapContentHeight(),
+                contentAlignment = Alignment.Center
             ) {
-                Row(
-                    Modifier
-                        .padding(horizontal = 8.dp, vertical = 2.dp)
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
+                Box(
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
+                        .fillMaxSize(100f),
+                    contentAlignment = Alignment.BottomEnd
                 ) {
                     ActionsRow(
                         actionIconSize = ACTION_ITEM_SIZE.dp,
@@ -194,7 +193,6 @@ fun TabsContent(
                 DraggableCard(
                     note = note,
                     isRevealed = revealedCardIds.contains(note.id),
-                    cardHeight = CARD_HEIGHT.dp,
                     cardOffset = CARD_OFFSET.dp(),
                     onExpand = { viewModel.onItemExpanded(note.id) },
                     onCollapse = { viewModel.onItemCollapsed(note.id) },

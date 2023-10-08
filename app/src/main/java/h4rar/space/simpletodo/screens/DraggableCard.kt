@@ -3,25 +3,22 @@ package h4rar.space.simpletodo.screens
 import android.annotation.SuppressLint
 import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.*
-import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import h4rar.space.simpletodo.model.Note
-import h4rar.space.simpletodo.ui.theme.BlackGray
 import kotlin.math.roundToInt
 
 const val ANIMATION_DURATION = 450
@@ -33,7 +30,6 @@ const val MIN_DRAG_AMOUNT = 6
 @Composable
 fun DraggableCard(
     note: Note,
-    cardHeight: Dp,
     isRevealed: Boolean,
     cardOffset: Float,
     onExpand: () -> Unit,
@@ -51,7 +47,6 @@ fun DraggableCard(
         transitionSpec = { tween(durationMillis = ANIMATION_DURATION) },
         targetValueByState = {
             if (isRevealed) MaterialTheme.colors.background else MaterialTheme.colors.background
-//            if (isRevealed) BlackGray else BlackGray
         }
     )
     val offsetTransition by transition.animateFloat(
@@ -70,8 +65,8 @@ fun DraggableCard(
         modifier =
         Modifier
             .fillMaxWidth()
+            .wrapContentHeight()
             .padding(horizontal = 16.dp, vertical = 2.dp)
-            .height(cardHeight)
             .offset { IntOffset(offsetTransition.roundToInt(), 0) }
             .draggable(
                 orientation = Orientation.Horizontal,

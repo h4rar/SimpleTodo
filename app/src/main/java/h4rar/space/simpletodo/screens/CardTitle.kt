@@ -3,6 +3,7 @@ package h4rar.space.simpletodo.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -10,7 +11,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
@@ -31,9 +31,9 @@ fun CardTitle(note: Note) {
         ),
         modifier = Modifier
             .fillMaxWidth()
+            .wrapContentHeight()
             .background(MaterialTheme.colors.primaryVariant)
-            .padding(6.dp)
-        ,
+            .padding(6.dp),
         textAlign = TextAlign.Center,
         textDecoration =
         if (note.isCompleted)
